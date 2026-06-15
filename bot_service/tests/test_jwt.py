@@ -1,16 +1,16 @@
-"""
-Модульные тесты проверки JWT для Bot Service.
-"""
+from datetime import datetime, timedelta, timezone
 
 import pytest
-from app.core.jwt import decode_and_validate, InvalidTokenException
-from app.core.config import settings
 from jose import jwt
-from datetime import datetime, timedelta, timezone
+
+from app.core.config import settings
+from app.core.jwt import InvalidTokenException, decode_and_validate
 
 
 def create_valid_token(sub="123", role="user", expires_delta=None):
-    """Вспомогательная: создаёт токен с теми же секретом и алгоритмом, что и Auth Service."""
+    """
+    Вспомогательная: создаёт токен с теми же секретом и алгоритмом, что и Auth Service.
+    """
     if expires_delta is None:
         expires_delta = timedelta(minutes=10)
     now = datetime.now(timezone.utc)
@@ -24,8 +24,9 @@ def create_valid_token(sub="123", role="user", expires_delta=None):
 
 
 class TestDecodeAndValidate:
-    """Тесты функции decode_and_validate."""
-
+    """
+    Тесты функции decode_and_validate.
+    """
     def test_valid_token(self):
         token = create_valid_token(sub="42", role="admin")
         payload = decode_and_validate(token)
@@ -42,8 +43,9 @@ class TestDecodeAndValidate:
             decode_and_validate("not.a.jwt")
 
     def test_wrong_signature(self):
-        # Токен, подписанный другим ключом
-        fake_payload = {"sub": "1", "exp": datetime.now(timezone.utc) + timedelta(hours=1)}
+        fake_payload = {
+            "sub": "1", "exp": datetime.now(timezone.utc) + timedelta(hours=1)
+            }
         fake_token = jwt.encode(fake_payload, "wrong-secret", algorithm="HS256")
         with pytest.raises(InvalidTokenException):
             decode_and_validate(fake_token)

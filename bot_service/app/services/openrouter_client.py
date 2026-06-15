@@ -1,7 +1,3 @@
-"""
-Клиент для взаимодействия с OpenRouter Chat Completions API.
-"""
-
 import httpx
 from httpx import HTTPStatusError, RequestError
 
@@ -9,17 +5,11 @@ from app.core.config import settings
 
 
 class LLMClientException(Exception):
-    """Исключение при ошибке обращения к LLM."""
     pass
-
 
 async def get_llm_response(user_message: str) -> str:
     """
     Отправляет сообщение пользователя в OpenRouter и возвращает ответ модели.
-
-    :param user_message: текст сообщения пользователя.
-    :return: ответ от LLM в виде строки.
-    :raises LLMClientException: при сетевой ошибке или не-200 ответе.
     """
     url = f"{settings.OPENROUTER_BASE_URL}/chat/completions"
     headers = {
@@ -39,7 +29,7 @@ async def get_llm_response(user_message: str) -> str:
             response.raise_for_status()
         except HTTPStatusError as exc:
             raise LLMClientException(
-                f"OpenRouter вернул статус {exc.response.status_code}: {exc.response.text}"
+                f"OpenRouter вернул {exc.response.status_code}: {exc.response.text}"
             )
         except RequestError as exc:
             raise LLMClientException(f"Ошибка сети при запросе к OpenRouter: {exc}")
@@ -49,4 +39,4 @@ async def get_llm_response(user_message: str) -> str:
         content = data["choices"][0]["message"]["content"]
         return content
     except (KeyError, IndexError, TypeError) as exc:
-        raise LLMClientException(f"Неожиданный формат ответа OpenRouter: {data}") from exc
+        raise LLMClientException(f"Неожиданный ответ OpenRouter: {data}") from exc

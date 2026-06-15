@@ -1,7 +1,3 @@
-"""
-Celery-задача для обработки LLM-запроса и отправки ответа пользователю.
-"""
-
 import asyncio
 import logging
 
@@ -26,7 +22,6 @@ def llm_request(self, tg_chat_id: int, prompt: str):
     Отправляет prompt в OpenRouter, получает ответ и отправляет его в Telegram.
     При ошибках LLM автоматически делает повторные попытки.
     """
-    # 1. Получить ответ LLM
     try:
         llm_answer = asyncio.run(get_llm_response(prompt))
     except (LLMClientException, httpx.HTTPError) as exc:
@@ -38,7 +33,6 @@ def llm_request(self, tg_chat_id: int, prompt: str):
         )
         raise self.retry(exc=exc)
 
-    # 2. Отправить ответ пользователю в Telegram
     send_url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": tg_chat_id,
@@ -52,4 +46,3 @@ def llm_request(self, tg_chat_id: int, prompt: str):
         logger.info("Sent LLM response to chat_id=%d", tg_chat_id)
     except Exception as exc:
         logger.error("Failed to send Telegram message: %s", exc)
-        # Не ретраим всю задачу, так как ответ LLM уже получен

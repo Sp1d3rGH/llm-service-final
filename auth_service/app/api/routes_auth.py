@@ -1,7 +1,3 @@
-"""
-Маршруты аутентификации: регистрация, вход, профиль.
-"""
-
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -19,7 +15,6 @@ async def register(
     body: RegisterRequest,
     auth_uc: AuthUseCase = Depends(get_auth_uc),
 ) -> UserPublic:
-    """Регистрация нового пользователя."""
     return await auth_uc.register(email=body.email, password=body.password)
 
 
@@ -28,7 +23,6 @@ async def login(
     form: OAuth2PasswordRequestForm = Depends(),
     auth_uc: AuthUseCase = Depends(get_auth_uc),
 ) -> TokenResponse:
-    """Аутентификация и получение JWT. В поле username передаётся email."""
     return await auth_uc.login(email=form.username, password=form.password)
 
 
@@ -36,5 +30,4 @@ async def login(
 async def me(
     current_user: User = Depends(get_current_user),
 ) -> UserPublic:
-    """Возвращает профиль текущего пользователя по токену."""
     return UserPublic.model_validate(current_user)

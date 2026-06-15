@@ -1,7 +1,3 @@
-"""
-Фабрика приложения FastAPI и lifespan для Auth Service.
-"""
-
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
@@ -17,7 +13,9 @@ from app.db.session import async_engine
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    """Создаём таблицы при старте (если ещё не созданы)."""
+    """
+    Создаём таблицы при старте (если ещё не созданы).
+    """
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
@@ -33,10 +31,8 @@ def create_app() -> FastAPI:
         docs_url="/docs",
     )
 
-    # Подключаем единственный роутер
     app.include_router(api_router)
 
-    # Обработчик кастомных HTTP-исключений
     @app.exception_handler(BaseHTTPException)
     async def custom_http_exception_handler(request: Request, exc: BaseHTTPException):
         return JSONResponse(
@@ -44,7 +40,6 @@ def create_app() -> FastAPI:
             content={"detail": exc.detail},
         )
 
-    # Глобальный обработчик непредвиденных ошибок
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception):
         return JSONResponse(
@@ -52,13 +47,10 @@ def create_app() -> FastAPI:
             content={"detail": "Internal server error"},
         )
 
-    # Системная ручка проверки здоровья
     @app.get("/health", tags=["system"])
     async def health() -> dict:
         return {"status": "ok"}
 
     return app
 
-
-# Экземпляр приложения для uvicorn
 app = create_app()

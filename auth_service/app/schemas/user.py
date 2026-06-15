@@ -1,15 +1,12 @@
-"""
-Публичное представление пользователя.
-"""
-
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
 
 class UserPublic(BaseModel):
-    """Схема пользователя, возвращаемая клиенту (без чувствительных полей)."""
-
+    """
+    Схема пользователя, возвращаемая клиенту (без чувствительных полей).
+    """
     id: int
     email: str
     role: str

@@ -1,21 +1,24 @@
-import pytest
 from datetime import timedelta
+
+import pytest
+
 from app.core.security import (
-    hash_password,
-    verify_password,
+    InvalidTokenException,
     create_access_token,
     decode_token,
-    InvalidTokenException,
+    hash_password,
+    verify_password,
 )
 
-class TestPasswordHashing:
-    """Тесты на хеширование и проверку паролей."""
 
+class TestPasswordHashing:
+    """
+    Тесты на хеширование и проверку паролей.
+    """
     def test_hash_returns_different_from_plain(self):
         plain = "securepassword123"
         hashed = hash_password(plain)
         assert hashed != plain
-        # bcrypt-хеш всегда начинается с $2b$ или подобного
         assert hashed.startswith("$2")
 
     def test_verify_correct_password(self):
@@ -30,8 +33,9 @@ class TestPasswordHashing:
 
 
 class TestJWT:
-    """Тесты на создание и декодирование JWT."""
-
+    """
+    Тесты на создание и декодирование JWT.
+    """
     def test_create_and_decode_token(self):
         data = {"sub": "123", "role": "user"}
         token = create_access_token(data)
@@ -43,7 +47,6 @@ class TestJWT:
 
     def test_decode_expired_token(self):
         data = {"sub": "123", "role": "user"}
-        # токен с отрицательным временем жизни (сразу истекает)
         expired_token = create_access_token(data, expires_delta=timedelta(seconds=-1))
         with pytest.raises(InvalidTokenException):
             decode_token(expired_token)

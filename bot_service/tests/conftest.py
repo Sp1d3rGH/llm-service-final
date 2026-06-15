@@ -1,7 +1,3 @@
-"""
-Общие фикстуры для тестов Bot Service.
-"""
-
 import pytest
 from fakeredis.aioredis import FakeRedis
 

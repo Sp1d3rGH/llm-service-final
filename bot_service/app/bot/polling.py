@@ -1,5 +1,6 @@
 import asyncio
 import logging
+
 from app.bot.dispatcher import bot, dp
 
 logging.basicConfig(level=logging.INFO)

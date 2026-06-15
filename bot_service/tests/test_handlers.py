@@ -1,13 +1,10 @@
-"""
-Мок-тесты обработчиков Telegram-бота.
-Используются только мок-объекты, без реального aiogram.Message.
-"""
+from datetime import datetime, timedelta, timezone
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock
-from app.bot.handlers import cmd_token, handle_message
 from jose import jwt
-from datetime import datetime, timedelta, timezone
+
+from app.bot.handlers import cmd_token, handle_message
 from app.core.config import settings
 
 
@@ -22,7 +19,6 @@ def make_token(sub="123", expires_delta=None):
 def create_mock_message(text: str, user_id: int = 12345, chat_id: int = 12345):
     """
     Создаёт мок-сообщение с минимальным набором атрибутов.
-    Метод answer уже заменён на AsyncMock, чтобы не требовался бот.
     """
     msg = MagicMock()
     msg.text = text
@@ -81,7 +77,6 @@ class TestTextMessage:
         user_id = 999
         chat_id = 888
 
-        # Сохраняем токен в fake redis
         redis = mock_get_redis
         await redis.setex(f"jwt:{user_id}", 3600, token)
 

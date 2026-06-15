@@ -1,11 +1,12 @@
 import pytest
 
-class TestAuthAPI:
-    """Интеграционные тесты через HTTP."""
 
+class TestAuthAPI:
+    """
+    Интеграционные тесты через HTTP.
+    """
     @pytest.mark.asyncio
     async def test_register_and_login_and_me(self, client):
-        # Регистрация
         register_resp = await client.post("/auth/register", json={
             "email": "user@example.com",
             "password": "secret123"
@@ -15,15 +16,12 @@ class TestAuthAPI:
         assert user_data["email"] == "user@example.com"
         assert "id" in user_data
 
-        # Логин (form-data)
         login_resp = await client.post("/auth/login", data={
-            "username": "user@example.com",   # OAuth2 форма использует username
+            "username": "user@example.com",
             "password": "secret123"
         })
         assert login_resp.status_code == 200
         token = login_resp.json()["access_token"]
-
-        # Получение профиля с токеном
         me_resp = await client.get("/auth/me", headers={
             "Authorization": f"Bearer {token}"
         })
@@ -34,12 +32,10 @@ class TestAuthAPI:
 
     @pytest.mark.asyncio
     async def test_duplicate_registration_returns_409(self, client):
-        # Первая регистрация
         await client.post("/auth/register", json={
             "email": "dup@example.com",
             "password": "password1"
         })
-        # Повтор с тем же email
         resp = await client.post("/auth/register", json={
             "email": "dup@example.com",
             "password": "password2"
